@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tron Lightcycle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        
+        #gameContainer {
+            text-align: center;
+        }
+        
+        #topUI {
+            margin-bottom: 20px;
+            color: #0ff;
+            font-size: 18px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        #scores {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+        
+        .player1 {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        .player2 {
+            color: #f0f;
+            text-shadow: 0 0 10px #f0f;
+        }
+        
+        #speedControl {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #speedSlider {
+            width: 200px;
+            height: 6px;
+            background: #003333;
+            outline: none;
+            border-radius: 3px;
+        }
+        
+        #speedSlider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #0ff;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0ff;
+        }
+        
+        #speedSlider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #0ff;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0ff;
+            border: none;
+        }
+        
+        #speedValue {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+            min-width: 80px;
+            font-weight: bold;
+        }
+        
+        label {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #0ff;
+            box-shadow: 0 0 20px #0ff, inset 0 0 20px #0ff;
+            background: #000;
+        }
+        
+        #bottomUI {
+            margin-top: 20px;
+            color: #0ff;
+            font-size: 18px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        #message {
+            font-size: 24px;
+            margin-bottom: 10px;
+            min-height: 30px;
+        }
+        
+        #controls {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        #instructionsBtn {
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: transparent;
+            border: 2px solid #0ff;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        #instructionsBtn:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+        
+        #instructionsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #instructionsModal.show {
+            display: flex;
+        }
+        
+        #instructionsContent {
+            background: #000;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 30px #0ff, inset 0 0 30px rgba(0, 255, 255, 0.1);
+            padding: 30px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #instructionsContent h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #0ff;
+        }
+        
+        #instructionsContent h3 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #f0f;
+            text-shadow: 0 0 10px #f0f;
+        }
+        
+        #instructionsContent p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        #instructionsContent ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        #instructionsContent li {
+            margin-bottom: 8px;
+        }
+        
+        .exampleGrid {
+            display: inline-block;
+            background: #001a1a;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #0ff;
+        }
+        
+        .exampleRow {
+            display: flex;
+        }
+        
+        .exampleCell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #003333;
+        }
+        
+        .exampleCell.trail {
+            background: #0ff;
+            box-shadow: 0 0 5px #0ff;
+        }
+        
+        .exampleCell.head {
+            background: #fff;
+            box-shadow: 0 0 10px #0ff;
+        }
+        
+        .exampleLabel {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        
+        #closeInstructions {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 30px;
+            background: transparent;
+            border: 2px solid #0ff;
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #closeInstructions:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="topUI">
+            <div id="scores">
+                <div class="player1">Player 1 (WASD): <span id="p1Score">0</span></div>
+                <div class="player2">Player 2 (Arrows): <span id="p2Score">0</span></div>
+            </div>
+            <div id="speedControl">
+                <label for="speedSlider">Speed:</label>
+                <input type="range" id="speedSlider" min="50" max="150" value="100" step="10">
+                <span id="speedValue">Normal</span>
+            </div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="bottomUI">
+            <div id="message">Press SPACE to start</div>
+            <div id="controls">
+                Player 1: W/A/S/D (combine for diagonals) | Player 2: Arrow Keys | SPACE: Start/Restart
+            </div>
+            <button id="instructionsBtn">How to Play</button>
+        </div>
+    </div>
+    
+    <div id="instructionsModal">
+        <div id="instructionsContent">
+            <h2>TRON LIGHTCYCLES: DIAGONAL EDITION</h2>
+            
+            <p>Welcome to the Grid, Program! This is classic Tron Lightcycles with a revolutionary twist - <strong>diagonal movement capability</strong>.</p>
+            
+            <h3>The Basics</h3>
+            <p>Each player controls a lightcycle that leaves a deadly light trail behind it. Crash into any trail (yours or your opponent's) or the arena walls, and you're derezzed! Last cycle standing wins.</p>
+            
+            <h3>The Diagonal Twist</h3>
+            <p>Unlike classic Tron, you can move in 8 directions instead of just 4! Simply hold down two movement keys simultaneously:</p>
+            <ul>
+                <li><strong>Player 1 (Cyan):</strong> Use W, A, S, D keys</li>
+                <li><strong>Player 2 (Magenta):</strong> Use Arrow Keys</li>
+            </ul>
+            
+            <h3>Diagonal Movement Examples</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <div class="exampleGrid">
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell head"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleLabel">Northeast (W + D / ↑ + →)</div>
+                </div>
+                
+                <div class="exampleGrid">
+                    <div class="exampleRow">
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell trail"></div>
+                        <div class="exampleCell"></div>
+                    </div>
+                    <div class="exampleRow">
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell"></div>
+                        <div class="exampleCell head"></div>
+                    </div>
+                    <div class="exampleLabel">Southeast (S + D / ↓ + →)</div>
+                </div>
+            </div>
+            
+            <h3>Strategic Advantages</h3>
+            <ul>
+                <li><strong>Cut Corners:</strong> Move diagonally to make tighter turns and trap opponents</li>
+                <li><strong>Escape Routes:</strong> More directions mean more options to avoid collisions</li>
+                <li><strong>Complex Patterns:</strong> Create intricate trail patterns to confuse your opponent</li>
+            </ul>
+            
+            <h3>Controls</h3>
+            <ul>
+                <li><strong>SPACE:</strong> Start/Restart game</li>
+                <li><strong>Speed Slider:</strong> Adjust game speed (Slow → Normal → Fast → Ludicrous)</li>
+                <li><strong>Audio:</strong> Engine sounds rev with each direction change</li>
+            </ul>
+            
+            <p style="text-align: center; margin-top: 20px;"><em>Fight for the Users!</em></p>
+            
+            <button id="closeInstructions">Enter the Grid</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const p1ScoreEl = document.getElementById('p1Score');
+        const p2ScoreEl = document.getElementById('p2Score');
+        const messageEl = document.getElementById('message');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedValue = document.getElementById('speedValue');
+        
+        const GRID_SIZE = 4;
+        let SPEED = 100;
+        const EXPLOSION_DURATION = 800;
+        
+        let gameState = 'waiting';
+        let lastTime = 0;
+        let accumulator = 0;
+        let explosions = [];
+        
+        // Audio context for sound effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let engineSounds = { p1: null, p2: null };
+        
+        // Track which keys are currently pressed
+        const keysPressed = new Set();
+        
+        const players = {
+            p1: {
+                x: 100,
+                y: 300,
+                dir: { x: 1, y: 0 },
+                trail: [],
+                color: '#0ff',
+                score: 0,
+                keys: { up: 'w', down: 's', left: 'a', right: 'd' },
+                alive: true
+            },
+            p2: {
+                x: 700,
+                y: 300,
+                dir: { x: -1, y: 0 },
+                trail: [],
+                color: '#f0f',
+                score: 0,
+                keys: { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },
+                alive: true
+            }
+        };
+        
+        const inputQueue = {
+            p1: [],
+            p2: []
+        };
+        
+        // Speed slider handling
+        speedSlider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            SPEED = 200 - value; // Inverse: higher slider value = faster speed
+            
+            if (value <= 60) {
+                speedValue.textContent = 'Slow';
+            } else if (value <= 90) {
+                speedValue.textContent = 'Normal';
+            } else if (value <= 120) {
+                speedValue.textContent = 'Fast';
+            } else {
+                speedValue.textContent = 'Ludicrous';
+            }
+        });
+        
+        // Create engine sound for a player
+        function createEngineSound(freq) {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            
+            osc.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            return { osc, gainNode, filter };
+        }
+        
+        // Start engine sounds
+        function startEngineSounds() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            // Stop existing sounds if any
+            stopAllEngineSounds(true);
+            
+            // Player 1 - lower pitch
+            engineSounds.p1 = createEngineSound(80);
+            engineSounds.p1.osc.start();
+            engineSounds.p1.gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            
+            // Player 2 - higher pitch
+            engineSounds.p2 = createEngineSound(95);
+            engineSounds.p2.osc.start();
+            engineSounds.p2.gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        }
+        
+        // Stop all engine sounds
+        function stopAllEngineSounds(immediate = false) {
+            stopEngineSound('p1', immediate);
+            stopEngineSound('p2', immediate);
+        }
+        
+        // Stop engine sound
+        function stopEngineSound(player, immediate = false) {
+            if (engineSounds[player]) {
+                try {
+                    if (immediate) {
+                        engineSounds[player].osc.stop();
+                        engineSounds[player] = null;
+                    } else {
+                        engineSounds[player].gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                        const soundToStop = engineSounds[player];
+                        engineSounds[player] = null;
+                        setTimeout(() => {
+                            if (soundToStop) {
+                                try {
+                                    soundToStop.osc.stop();
+                                } catch (e) {}
+                            }
+                        }, 350);
+                    }
+                } catch (e) {
+                    engineSounds[player] = null;
+                }
+            }
+        }
+        
+        // Play direction change sound effect
+        function playDirectionChangeSound(player) {
+            if (!engineSounds[player]) return;
+            
+            try {
+                const baseFreq = player === 'p1' ? 80 : 95;
+                const osc = engineSounds[player].osc;
+                const filter = engineSounds[player].filter;
+                
+                // Quick pitch rise
+                osc.frequency.cancelScheduledValues(audioCtx.currentTime);
+                osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, audioCtx.currentTime + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq, audioCtx.currentTime + 0.2);
+                
+                // Filter sweep
+                filter.frequency.cancelScheduledValues(audioCtx.currentTime);
+                filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(1500, audioCtx.currentTime + 0.1);
+                filter.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
+            } catch (e) {
+                // Ignore errors
+            }
+        }
+        
+        // Modulate engine sound based on movement
+        function modulateEngine(player, baseFreq) {
+            if (engineSounds[player]) {
+                try {
+                    const modulation = Math.sin(Date.now() / 100) * 5;
+                    engineSounds[player].osc.frequency.setValueAtTime(baseFreq + modulation, audioCtx.currentTime);
+                } catch (e) {
+                    engineSounds[player] = null;
+                }
+            }
+        }
+        
+        // Explosion sound effect
+        function playExplosionSound() {
+            const duration = 0.5;
+            
+            // Noise generator for explosion
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.2));
+            }
+            
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'lowpass';
+            noiseFilter.frequency.setValueAtTime(2000, audioCtx.currentTime);
+            noiseFilter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + duration);
+            
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            
+            // Bass thump
+            const bass = audioCtx.createOscillator();
+            bass.type = 'sine';
+            bass.frequency.setValueAtTime(60, audioCtx.currentTime);
+            bass.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + duration);
+            
+            const bassGain = audioCtx.createGain();
+            bassGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            bassGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            
+            noise.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            
+            bass.connect(bassGain);
+            bassGain.connect(audioCtx.destination);
+            
+            noise.start();
+            bass.start();
+            noise.stop(audioCtx.currentTime + duration);
+            bass.stop(audioCtx.currentTime + duration);
+        }
+        
+        function initGame() {
+            players.p1.x = 100;
+            players.p1.y = 300;
+            players.p1.dir = { x: 1, y: 0 };
+            players.p1.trail = [{ x: 100, y: 300 }];
+            players.p1.alive = true;
+            
+            players.p2.x = 700;
+            players.p2.y = 300;
+            players.p2.dir = { x: -1, y: 0 };
+            players.p2.trail = [{ x: 700, y: 300 }];
+            players.p2.alive = true;
+            
+            inputQueue.p1 = [];
+            inputQueue.p2 = [];
+            explosions = [];
+            keysPressed.clear();
+            
+            gameState = 'playing';
+            messageEl.textContent = '';
+            
+            startEngineSounds();
+        }
+        
+        function handleKeyDown(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                // Resume audio context on first user interaction
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                if (gameState !== 'playing') {
+                    initGame();
+                }
+                return;
+            }
+            
+            if (gameState !== 'playing') return;
+            
+            // Store the actual key (not lowercased for arrow keys)
+            keysPressed.add(e.key);
+            
+            // Calculate direction based on pressed keys
+            calculateDirection();
+        }
+        
+        function handleKeyUp(e) {
+            keysPressed.delete(e.key);
+            
+            if (gameState === 'playing') {
+                calculateDirection();
+            }
+        }
+        
+        function calculateDirection() {
+            // Player 1
+            let p1dx = 0, p1dy = 0;
+            if (keysPressed.has(players.p1.keys.right)) p1dx += 1;
+            if (keysPressed.has(players.p1.keys.left)) p1dx -= 1;
+            if (keysPressed.has(players.p1.keys.down)) p1dy += 1;
+            if (keysPressed.has(players.p1.keys.up)) p1dy -= 1;
+            
+            if (p1dx !== 0 || p1dy !== 0) {
+                // Normalize diagonal movement
+                const length = Math.sqrt(p1dx * p1dx + p1dy * p1dy);
+                const newDir = { x: p1dx / length, y: p1dy / length };
+                
+                // Check if direction actually changed
+                const dirChanged = Math.abs(newDir.x - players.p1.dir.x) > 0.01 || 
+                                   Math.abs(newDir.y - players.p1.dir.y) > 0.01;
+                
+                if (dirChanged && inputQueue.p1.length < 2) {
+                    inputQueue.p1.push(newDir);
+                }
+            }
+            
+            // Player 2
+            let p2dx = 0, p2dy = 0;
+            if (keysPressed.has(players.p2.keys.right)) p2dx += 1;
+            if (keysPressed.has(players.p2.keys.left)) p2dx -= 1;
+            if (keysPressed.has(players.p2.keys.down)) p2dy += 1;
+            if (keysPressed.has(players.p2.keys.up)) p2dy -= 1;
+            
+            if (p2dx !== 0 || p2dy !== 0) {
+                // Normalize diagonal movement
+                const length = Math.sqrt(p2dx * p2dx + p2dy * p2dy);
+                const newDir = { x: p2dx / length, y: p2dy / length };
+                
+                // Check if direction actually changed
+                const dirChanged = Math.abs(newDir.x - players.p2.dir.x) > 0.01 || 
+                                   Math.abs(newDir.y - players.p2.dir.y) > 0.01;
+                
+                if (dirChanged && inputQueue.p2.length < 2) {
+                    inputQueue.p2.push(newDir);
+                }
+            }
+        }
+        
+        function processInput(player, queue, playerKey) {
+            if (queue.length > 0) {
+                const newDir = queue.shift();
+                // Prevent direct reversal (but allow diagonal shifts)
+                const dotProduct = newDir.x * player.dir.x + newDir.y * player.dir.y;
+                if (dotProduct > -0.9) { // Allow most direction changes except near 180 degrees
+                    player.dir = newDir;
+                    playDirectionChangeSound(playerKey);
+                }
+            }
+        }
+        
+        function createExplosion(x, y, color) {
+            const particles = [];
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const speed = 2 + Math.random() * 3;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1.0,
+                    size: 2 + Math.random() * 3
+                });
+            }
+            
+            explosions.push({
+                particles: particles,
+                color: color,
+                startTime: Date.now(),
+                x: x,
+                y: y
+            });
+        }
+        
+        function updateExplosions() {
+            const now = Date.now();
+            explosions = explosions.filter(exp => {
+                const age = now - exp.startTime;
+                if (age > EXPLOSION_DURATION) return false;
+                
+                exp.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.1; // gravity
+                    p.vx *= 0.98; // friction
+                    p.vy *= 0.98;
+                    p.life = 1 - (age / EXPLOSION_DURATION);
+                });
+                
+                return true;
+            });
+        }
+        
+        function drawExplosions() {
+            explosions.forEach(exp => {
+                exp.particles.forEach(p => {
+                    ctx.fillStyle = exp.color;
+                    ctx.globalAlpha = p.life;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = exp.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                // Core flash
+                const age = Date.now() - exp.startTime;
+                if (age < 200) {
+                    ctx.globalAlpha = 1 - (age / 200);
+                    ctx.shadowBlur = 30;
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(exp.x, exp.y, 20 * (1 - age / 200), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+        
+        function update() {
+            if (gameState !== 'playing') return;
+            
+            // Modulate engine sounds
+            modulateEngine('p1', 80);
+            modulateEngine('p2', 95);
+            
+            processInput(players.p1, inputQueue.p1, 'p1');
+            processInput(players.p2, inputQueue.p2, 'p2');
+            
+            // Move players
+            players.p1.x += players.p1.dir.x * GRID_SIZE;
+            players.p1.y += players.p1.dir.y * GRID_SIZE;
+            players.p2.x += players.p2.dir.x * GRID_SIZE;
+            players.p2.y += players.p2.dir.y * GRID_SIZE;
+            
+            // Add to trails
+            players.p1.trail.push({ x: players.p1.x, y: players.p1.y });
+            players.p2.trail.push({ x: players.p2.x, y: players.p2.y });
+            
+            // Check collisions
+            const p1Dead = checkCollision(players.p1, players.p2);
+            const p2Dead = checkCollision(players.p2, players.p1);
+            
+            if (p1Dead || p2Dead) {
+                gameState = 'exploding';
+                
+                // Stop all engine sounds immediately
+                stopAllEngineSounds(false);
+                
+                // Play explosion sound
+                playExplosionSound();
+                
+                if (p1Dead) {
+                    createExplosion(players.p1.x, players.p1.y, players.p1.color);
+                    players.p1.alive = false;
+                }
+                if (p2Dead) {
+                    createExplosion(players.p2.x, players.p2.y, players.p2.color);
+                    players.p2.alive = false;
+                }
+                
+                setTimeout(() => {
+                    if (p1Dead && p2Dead) {
+                        // Both players get a point for head-on collision
+                        players.p1.score++;
+                        players.p2.score++;
+                        p1ScoreEl.textContent = players.p1.score;
+                        p2ScoreEl.textContent = players.p2.score;
+                        messageEl.textContent = 'Head-On Collision! Both Score! Press SPACE to restart';
+                    } else if (p1Dead) {
+                        players.p2.score++;
+                        p2ScoreEl.textContent = players.p2.score;
+                        messageEl.textContent = 'Player 2 Wins! Press SPACE to restart';
+                    } else if (p2Dead) {
+                        players.p1.score++;
+                        p1ScoreEl.textContent = players.p1.score;
+                        messageEl.textContent = 'Player 1 Wins! Press SPACE to restart';
+                    }
+                    gameState = 'gameOver';
+                }, EXPLOSION_DURATION);
+            }
+        }
+        
+        function checkCollision(player, opponent) {
+            // Wall collision
+            if (player.x < 0 || player.x >= canvas.width || 
+                player.y < 0 || player.y >= canvas.height) {
+                return true;
+            }
+            
+            // Self collision (excluding recent trail for smoother diagonal movement)
+            for (let i = 0; i < player.trail.length - 3; i++) {
+                const dist = Math.sqrt(
+                    Math.pow(player.x - player.trail[i].x, 2) + 
+                    Math.pow(player.y - player.trail[i].y, 2)
+                );
+                if (dist < GRID_SIZE) {
+                    return true;
+                }
+            }
+            
+            // Opponent collision
+            for (let i = 0; i < opponent.trail.length - 1; i++) {
+                const dist = Math.sqrt(
+                    Math.pow(player.x - opponent.trail[i].x, 2) + 
+                    Math.pow(player.y - opponent.trail[i].y, 2)
+                );
+                if (dist < GRID_SIZE) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#001a1a';
+            ctx.lineWidth = 0.5;
+            for (let x = 0; x < canvas.width; x += GRID_SIZE * 5) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += GRID_SIZE * 5) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw trails
+            drawTrail(players.p1);
+            drawTrail(players.p2);
+            
+            // Draw explosions
+            drawExplosions();
+        }
+        
+        function drawTrail(player) {
+            if (player.trail.length < 2) return;
+            
+            ctx.strokeStyle = player.color;
+            ctx.lineWidth = GRID_SIZE;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = player.color;
+            
+            ctx.beginPath();
+            ctx.moveTo(player.trail[0].x, player.trail[0].y);
+            for (let i = 1; i < player.trail.length; i++) {
+                ctx.lineTo(player.trail[i].x, player.trail[i].y);
+            }
+            ctx.stroke();
+            
+            // Draw lightcycle icon only if alive
+            if (player.alive) {
+                drawLightcycle(player);
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+        
+        function drawLightcycle(player) {
+            const head = player.trail[player.trail.length - 1];
+            const size = 12;
+            
+            ctx.save();
+            ctx.translate(head.x, head.y);
+            
+            // Calculate rotation angle based on direction
+            const angle = Math.atan2(player.dir.y, player.dir.x);
+            ctx.rotate(angle);
+            
+            // Draw bike body
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = player.color;
+            
+            // Main body (elongated hexagon shape)
+            ctx.beginPath();
+            ctx.moveTo(size * 0.6, 0);
+            ctx.lineTo(size * 0.3, size * 0.4);
+            ctx.lineTo(-size * 0.4, size * 0.4);
+            ctx.lineTo(-size * 0.6, 0);
+            ctx.lineTo(-size * 0.4, -size * 0.4);
+            ctx.lineTo(size * 0.3, -size * 0.4);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Front glow
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(size * 0.5, 0, size * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Light trail effect behind bike
+            const gradient = ctx.createLinearGradient(0, 0, -size * 1.5, 0);
+            gradient.addColorStop(0, player.color);
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = gradient;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.4, size * 0.3);
+            ctx.lineTo(-size * 1.2, size * 0.2);
+            ctx.lineTo(-size * 1.2, -size * 0.2);
+            ctx.lineTo(-size * 0.4, -size * 0.3);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        function gameLoop(currentTime) {
+            const deltaTime = currentTime - lastTime;
+            lastTime = currentTime;
+            
+            if (gameState === 'playing') {
+                accumulator += deltaTime;
+                while (accumulator >= SPEED) {
+                    update();
+                    accumulator -= SPEED;
+                }
+            }
+            
+            updateExplosions();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+        
+        // Instructions modal handling
+        document.getElementById('instructionsBtn').addEventListener('click', () => {
+            document.getElementById('instructionsModal').classList.add('show');
+        });
+        
+        document.getElementById('closeInstructions').addEventListener('click', () => {
+            document.getElementById('instructionsModal').classList.remove('show');
+        });
+        
+        document.getElementById('instructionsModal').addEventListener('click', (e) => {
+            if (e.target.id === 'instructionsModal') {
+                document.getElementById('instructionsModal').classList.remove('show');
+            }
+        });
+        
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
