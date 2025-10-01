@@ -2,7 +2,7 @@
 
 A modern take on the classic Tron Lightcycles arcade game with a revolutionary twist - **8-directional diagonal movement**! Built with pure HTML5, CSS3, and JavaScript with Web Audio API for immersive sound effects.
 
-![Tron Lightcycles Game](screenshot.png)
+![Tron Lightcycles Game](tron-lightcycles.png)
 
 ## 🎮 Play Now
 
