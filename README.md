@@ -1,12 +1,12 @@
-# 🏍️ Tron Lightcycles: Diagonal Edition
+# 🏍️ Sam's Lightcycles: Diagonal Edition
 
-A modern take on the classic Tron Lightcycles arcade game with a revolutionary twist - **8-directional diagonal movement**! Built with pure HTML5, CSS3, and JavaScript with Web Audio API for immersive sound effects.
+A modern take on the classic Sam's Lightcycles arcade game with a revolutionary twist - **8-directional diagonal movement**! Built with pure HTML5, CSS3, and JavaScript with Web Audio API for immersive sound effects.
 
-![Tron Lightcycles Game](tron-lightcycles.png)
+![Sam's Lightcycles Game](tron-lightcycles.png)
 
 ## 🎮 Play Now
 
-[**Play the game here!**](https://nwfella.github.io/tron-lightcycles/)
+[**Play the game here!**](https://nwfella.github.io/sams-lightcycles/)
 
 Simply open `index.html` in any modern web browser to start playing!
 
@@ -20,7 +20,7 @@ Simply open `index.html` in any modern web browser to start playing!
   - Explosive collision sound effects
 - **Adjustable Speed**: Choose from Slow, Normal, Fast, or Ludicrous speed settings
 - **Particle Effects**: Spectacular explosion animations on collision
-- **Retro Aesthetic**: Neon glowing trails and Tron-inspired visual design
+- **Retro Aesthetic**: Neon glowing trails and Sam's Lightcycles-inspired visual design
 - **Top-Down Lightcycle Icons**: Animated bikes with streaming light trails
 - **Score Tracking**: Persistent scores across rounds
 - **Head-On Collision Bonus**: Both players score when they collide head-on!
@@ -65,8 +65,8 @@ Simply open `index.html` in any modern web browser to start playing!
 ### Quick Start
 1. Download or clone this repository:
    ```bash
-   git clone https://github.com/yourusername/tron-lightcycles.git
-   cd tron-lightcycles
+   git clone https://github.com/nwfella/sams-lightcycles.git
+   cd sams-lightcycles
    ```
 
 2. Open `index.html` in your web browser
@@ -79,12 +79,12 @@ That's it! No build process or dependencies required.
 2. Navigate to "Pages" in the left sidebar
 3. Under "Source", select the branch (usually `main`) and folder (`root`)
 4. Click "Save"
-5. Your game will be live at `https://yourusername.github.io/tron-lightcycles`
+5. Your game will be live at `https://nwfella.github.io/sams-lightcycles`
 
 ## 📁 Project Structure
 
 ```
-tron-lightcycles/
+sams-lightcycles/
 ├── index.html          # Main game file (complete standalone)
 ├── README.md           # This file
 ├── LICENSE             # MIT License
