@@ -153,10 +153,6 @@
             align-items: center;
         }
         
-        #instructionsModal.show {
-            display: flex;
-        }
-        
         #instructionsContent {
             background: #000;
             border: 2px solid #0ff;
@@ -252,6 +248,38 @@
             color: #000;
             box-shadow: 0 0 20px #0ff;
         }
+        
+        #muteBtn {
+            background: transparent;
+            border: 2px solid #0ff;
+            color: #0ff;
+            font-size: 18px;
+            padding: 4px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s;
+            line-height: 1;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #muteBtn:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+        
+        #muteBtn.muted {
+            border-color: #f0f;
+            color: #f0f;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+        
+        #muteBtn.muted:hover {
+            background: #f0f;
+            color: #000;
+            box-shadow: 0 0 20px #f0f;
+        }
     </style>
 </head>
 <body>
@@ -265,6 +293,7 @@
                 <label for="speedSlider">Speed:</label>
                 <input type="range" id="speedSlider" min="50" max="150" value="100" step="10">
                 <span id="speedValue">Normal</span>
+                <button id="muteBtn" title="Toggle sound">🔊</button>
             </div>
         </div>
         <canvas id="gameCanvas" width="800" height="600"></canvas>
@@ -410,6 +439,7 @@
         let gameState = 'waiting';
         let lastTime = 0;
         let accumulator = 0;
+        let muted = false;
         let explosions = [];
         
         // Audio context for sound effects
@@ -486,6 +516,8 @@
         
         // Start engine sounds
         function startEngineSounds() {
+            if (muted) return;
+            
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -574,6 +606,8 @@
         
         // Explosion sound effect
         function playExplosionSound() {
+            if (muted) return;
+            
             const duration = 0.5;
             
             // Noise generator for explosion
@@ -642,6 +676,22 @@
             messageEl.textContent = '';
             
             startEngineSounds();
+        }
+        
+        function toggleMute() {
+            muted = !muted;
+            const btn = document.getElementById('muteBtn');
+            if (muted) {
+                btn.textContent = '🔇';
+                btn.classList.add('muted');
+                stopAllEngineSounds(true);
+            } else {
+                btn.textContent = '🔊';
+                btn.classList.remove('muted');
+                if (gameState === 'playing') {
+                    startEngineSounds();
+                }
+            }
         }
         
         function handleKeyDown(e) {
@@ -1028,19 +1078,20 @@
         document.addEventListener('keyup', handleKeyUp);
         
         // Instructions modal handling
-        document.getElementById('instructionsBtn').addEventListener('click', () => {
-            document.getElementById('instructionsModal').classList.add('show');
-        });
-        
-        document.getElementById('closeInstructions').addEventListener('click', () => {
-            document.getElementById('instructionsModal').classList.remove('show');
-        });
-        
+        function showModal() {
+            document.getElementById('instructionsModal').style.display = 'flex';
+        }
+        function hideModal() {
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+        document.getElementById('instructionsBtn').addEventListener('click', showModal);
+        document.getElementById('closeInstructions').addEventListener('click', hideModal);
         document.getElementById('instructionsModal').addEventListener('click', (e) => {
-            if (e.target.id === 'instructionsModal') {
-                document.getElementById('instructionsModal').classList.remove('show');
-            }
+            if (e.target.id === 'instructionsModal') hideModal();
         });
+        
+        // Mute button
+        document.getElementById('muteBtn').addEventListener('click', toggleMute);
         
         requestAnimationFrame(gameLoop);
     </script>
