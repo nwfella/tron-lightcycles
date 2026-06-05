@@ -6,7 +6,7 @@ A modern take on the classic Tron Lightcycles arcade game with a revolutionary t
 
 ## 🎮 Play Now
 
-[**Play the game here!**](https://yourusername.github.io/tron-lightcycles)
+[**Play the game here!**](https://nwfella.github.io/tron-lightcycles/)
 
 Simply open `index.html` in any modern web browser to start playing!
 
