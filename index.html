@@ -645,8 +645,12 @@
         }
         
         function handleKeyDown(e) {
-            if (e.code === 'Space') {
+            // Prevent scrolling from game keys
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
                 e.preventDefault();
+            }
+            
+            if (e.code === 'Space') {
                 // Resume audio context on first user interaction
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
