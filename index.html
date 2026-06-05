@@ -281,7 +281,7 @@
             box-shadow: 0 0 20px #f0f;
         }
         
-        /* ── Mobile Touch Controls ── */
+        /* ── Mobile Touch Controls (Virtual Joysticks) ── */
         .mobile-only {
             display: none;
         }
@@ -302,75 +302,67 @@
             pointer-events: auto;
         }
         
-        .pad {
+        .joystick-zone {
             position: absolute;
-            bottom: 20px;
-            display: grid;
-            grid-template-columns: 52px 52px 52px;
-            grid-template-rows: 52px 52px;
-            gap: 4px;
+            bottom: 15px;
+            width: 130px;
+            height: 130px;
             pointer-events: auto;
-        }
-        .p1-pad { left: 20px; }
-        .p2-pad { right: 20px; }
-        
-        .touch-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 8px;
-            border: 2px solid;
-            background: rgba(0, 0, 0, 0.55);
-            font-size: 22px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
             touch-action: none;
-            user-select: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.1s, box-shadow 0.1s;
         }
-        .touch-btn:active,
-        .touch-btn.pressed {
-            background: rgba(0, 0, 0, 0.85);
+        #joyP1 { left: 15px; }
+        #joyP2 { right: 15px; }
+        
+        .joy-base {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110px;
+            height: 110px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
-        .p1-pad .touch-btn {
-            color: #0ff;
-            border-color: #0ff;
-            text-shadow: 0 0 8px #0ff;
-            box-shadow: 0 0 6px rgba(0,255,255,0.3), inset 0 0 6px rgba(0,255,255,0.1);
+        #joyP1 .joy-base {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.25);
         }
-        .p1-pad .touch-btn:active,
-        .p1-pad .touch-btn.pressed {
-            box-shadow: 0 0 16px #0ff, inset 0 0 10px rgba(0,255,255,0.3);
-        }
-        .p2-pad .touch-btn {
-            color: #f0f;
-            border-color: #f0f;
-            text-shadow: 0 0 8px #f0f;
-            box-shadow: 0 0 6px rgba(255,0,255,0.3), inset 0 0 6px rgba(255,0,255,0.1);
-        }
-        .p2-pad .touch-btn:active,
-        .p2-pad .touch-btn.pressed {
-            box-shadow: 0 0 16px #f0f, inset 0 0 10px rgba(255,0,255,0.3);
+        #joyP2 .joy-base {
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2), inset 0 0 20px rgba(255, 0, 255, 0.05);
+            border-color: rgba(255, 0, 255, 0.25);
         }
         
-        /* D-pad grid positions */
-        .touch-btn[data-key="w"],
-        .touch-btn[data-key="ArrowUp"] {
-            grid-column: 2; grid-row: 1;
+        .joy-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
         }
-        .touch-btn[data-key="a"],
-        .touch-btn[data-key="ArrowLeft"] {
-            grid-column: 1; grid-row: 2;
+        
+        .joy-stick {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 44px;
+            height: 44px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            transition: transform 0.08s ease-out;
         }
-        .touch-btn[data-key="s"],
-        .touch-btn[data-key="ArrowDown"] {
-            grid-column: 2; grid-row: 2;
+        #joyP1 .joy-stick {
+            background: radial-gradient(circle at 40% 35%, rgba(0,255,255,0.5), rgba(0,200,200,0.3));
+            border: 2px solid rgba(0, 255, 255, 0.6);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.2);
         }
-        .touch-btn[data-key="d"],
-        .touch-btn[data-key="ArrowRight"] {
-            grid-column: 3; grid-row: 2;
+        #joyP2 .joy-stick {
+            background: radial-gradient(circle at 40% 35%, rgba(255,0,255,0.5), rgba(200,0,200,0.3));
+            border: 2px solid rgba(255, 0, 255, 0.6);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4), inset 0 0 10px rgba(255, 0, 255, 0.2);
         }
         
         /* ── Start Overlay ── */
@@ -572,17 +564,17 @@
 
     <!-- Mobile touch controls -->
     <div id="touchControls" class="mobile-only">
-        <div class="pad p1-pad">
-            <button class="touch-btn" data-key="w">▲</button>
-            <button class="touch-btn" data-key="a">◄</button>
-            <button class="touch-btn" data-key="s">▼</button>
-            <button class="touch-btn" data-key="d">►</button>
+        <div class="joystick-zone" id="joyP1">
+            <div class="joy-base">
+                <div class="joy-ring"></div>
+                <div class="joy-stick" id="stickP1"></div>
+            </div>
         </div>
-        <div class="pad p2-pad">
-            <button class="touch-btn" data-key="ArrowUp">▲</button>
-            <button class="touch-btn" data-key="ArrowLeft">◄</button>
-            <button class="touch-btn" data-key="ArrowDown">▼</button>
-            <button class="touch-btn" data-key="ArrowRight">►</button>
+        <div class="joystick-zone" id="joyP2">
+            <div class="joy-base">
+                <div class="joy-ring"></div>
+                <div class="joy-stick" id="stickP2"></div>
+            </div>
         </div>
     </div>
 
@@ -1285,30 +1277,110 @@
             document.getElementById('controls').textContent = 'Use the touch controls to drive!';
             document.getElementById('message').textContent = 'TAP TO START';
             
-            // Touch buttons simulate keyboard
-            document.querySelectorAll('.touch-btn').forEach(btn => {
-                const key = btn.dataset.key;
+            // ── Virtual Joystick controls ──
+            const joysticks = { p1: null, p2: null };
+            const JOY_DEADZONE = 10; // px radius to ignore
+            const JOY_RADIUS = 40;   // max stick travel from center
+            
+            // Map angle (radians, -π to π) to array of key names for a given player
+            function angleToKeys(angle, playerKeys) {
+                const sectors = [
+                    { min: -Math.PI/8,  max: Math.PI/8,  keys: [playerKeys.right] },
+                    { min: Math.PI/8,   max: 3*Math.PI/8, keys: [playerKeys.down, playerKeys.right] },
+                    { min: 3*Math.PI/8, max: 5*Math.PI/8, keys: [playerKeys.down] },
+                    { min: 5*Math.PI/8, max: 7*Math.PI/8, keys: [playerKeys.down, playerKeys.left] },
+                    { min: 7*Math.PI/8, max: Math.PI,     keys: [playerKeys.left] },
+                    { min: -Math.PI,    max: -7*Math.PI/8, keys: [playerKeys.left] },
+                    { min: -7*Math.PI/8,max: -5*Math.PI/8, keys: [playerKeys.up, playerKeys.left] },
+                    { min: -5*Math.PI/8,max: -3*Math.PI/8, keys: [playerKeys.up] },
+                    { min: -3*Math.PI/8,max: -Math.PI/8,  keys: [playerKeys.up, playerKeys.right] },
+                ];
+                for (const s of sectors) {
+                    if (angle >= s.min && angle < s.max) return s.keys;
+                }
+                return [playerKeys.right]; // fallback
+            }
+            
+            function setupJoystick(zoneId, stickId, playerKeys, playerKey) {
+                const zone = document.getElementById(zoneId);
+                const stick = document.getElementById(stickId);
+                const base = zone.querySelector('.joy-base');
+                let active = false;
+                let touchId = null;
+                let centerX = 0, centerY = 0;
+                let currentKeys = [];
                 
-                btn.addEventListener('touchstart', (e) => {
+                function updateDirection(dx, dy) {
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    // Clear previous keys
+                    currentKeys.forEach(k => keysPressed.delete(k));
+                    currentKeys = [];
+                    
+                    if (dist > JOY_DEADZONE) {
+                        const clamped = Math.min(dist, JOY_RADIUS);
+                        const nx = (dx / dist) * clamped;
+                        const ny = (dy / dist) * clamped;
+                        stick.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+                        
+                        const angle = Math.atan2(ny, nx);
+                        currentKeys = angleToKeys(angle, playerKeys);
+                        currentKeys.forEach(k => keysPressed.add(k));
+                    } else {
+                        stick.style.transform = 'translate(-50%, -50%)';
+                    }
+                    calculateDirection();
+                }
+                
+                function handleStart(e) {
                     e.preventDefault();
-                    keysPressed.add(key);
-                    btn.classList.add('pressed');
-                    calculateDirection();
-                }, {passive: false});
+                    const touch = e.changedTouches[0];
+                    const rect = base.getBoundingClientRect();
+                    centerX = rect.left + rect.width / 2;
+                    centerY = rect.top + rect.height / 2;
+                    touchId = touch.identifier;
+                    active = true;
+                    
+                    const dx = touch.clientX - centerX;
+                    const dy = touch.clientY - centerY;
+                    updateDirection(dx, dy);
+                }
                 
-                btn.addEventListener('touchend', (e) => {
+                function handleMove(e) {
+                    if (!active) return;
                     e.preventDefault();
-                    keysPressed.delete(key);
-                    btn.classList.remove('pressed');
-                    calculateDirection();
-                }, {passive: false});
+                    for (const touch of e.changedTouches) {
+                        if (touch.identifier === touchId) {
+                            const dx = touch.clientX - centerX;
+                            const dy = touch.clientY - centerY;
+                            updateDirection(dx, dy);
+                            break;
+                        }
+                    }
+                }
                 
-                btn.addEventListener('touchcancel', () => {
-                    keysPressed.delete(key);
-                    btn.classList.remove('pressed');
-                    calculateDirection();
-                });
-            });
+                function handleEnd(e) {
+                    for (const touch of e.changedTouches) {
+                        if (touch.identifier === touchId) {
+                            active = false;
+                            touchId = null;
+                            currentKeys.forEach(k => keysPressed.delete(k));
+                            currentKeys = [];
+                            stick.style.transform = 'translate(-50%, -50%)';
+                            calculateDirection();
+                            break;
+                        }
+                    }
+                }
+                
+                zone.addEventListener('touchstart', handleStart, {passive: false});
+                zone.addEventListener('touchmove', handleMove, {passive: false});
+                zone.addEventListener('touchend', handleEnd, {passive: false});
+                zone.addEventListener('touchcancel', handleEnd, {passive: false});
+            }
+            
+            setupJoystick('joyP1', 'stickP1', players.p1.keys, 'p1');
+            setupJoystick('joyP2', 'stickP2', players.p2.keys, 'p2');
             
             // Start overlay — tap starts the game
             function handleStartTap(e) {
