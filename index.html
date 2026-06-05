@@ -280,6 +280,153 @@
             color: #000;
             box-shadow: 0 0 20px #f0f;
         }
+        
+        /* ── Mobile Touch Controls ── */
+        .mobile-only {
+            display: none;
+        }
+        .mobile-only.active {
+            display: block;
+        }
+        
+        #touchControls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+        #touchControls.active {
+            pointer-events: auto;
+        }
+        
+        .pad {
+            position: absolute;
+            bottom: 20px;
+            display: grid;
+            grid-template-columns: 52px 52px 52px;
+            grid-template-rows: 52px 52px;
+            gap: 4px;
+            pointer-events: auto;
+        }
+        .p1-pad { left: 20px; }
+        .p2-pad { right: 20px; }
+        
+        .touch-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            border: 2px solid;
+            background: rgba(0, 0, 0, 0.55);
+            font-size: 22px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.1s, box-shadow 0.1s;
+        }
+        .touch-btn:active,
+        .touch-btn.pressed {
+            background: rgba(0, 0, 0, 0.85);
+        }
+        .p1-pad .touch-btn {
+            color: #0ff;
+            border-color: #0ff;
+            text-shadow: 0 0 8px #0ff;
+            box-shadow: 0 0 6px rgba(0,255,255,0.3), inset 0 0 6px rgba(0,255,255,0.1);
+        }
+        .p1-pad .touch-btn:active,
+        .p1-pad .touch-btn.pressed {
+            box-shadow: 0 0 16px #0ff, inset 0 0 10px rgba(0,255,255,0.3);
+        }
+        .p2-pad .touch-btn {
+            color: #f0f;
+            border-color: #f0f;
+            text-shadow: 0 0 8px #f0f;
+            box-shadow: 0 0 6px rgba(255,0,255,0.3), inset 0 0 6px rgba(255,0,255,0.1);
+        }
+        .p2-pad .touch-btn:active,
+        .p2-pad .touch-btn.pressed {
+            box-shadow: 0 0 16px #f0f, inset 0 0 10px rgba(255,0,255,0.3);
+        }
+        
+        /* D-pad grid positions */
+        .touch-btn[data-key="w"],
+        .touch-btn[data-key="ArrowUp"] {
+            grid-column: 2; grid-row: 1;
+        }
+        .touch-btn[data-key="a"],
+        .touch-btn[data-key="ArrowLeft"] {
+            grid-column: 1; grid-row: 2;
+        }
+        .touch-btn[data-key="s"],
+        .touch-btn[data-key="ArrowDown"] {
+            grid-column: 2; grid-row: 2;
+        }
+        .touch-btn[data-key="d"],
+        .touch-btn[data-key="ArrowRight"] {
+            grid-column: 3; grid-row: 2;
+        }
+        
+        /* ── Start Overlay ── */
+        #startOverlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        #startOverlay.active {
+            display: flex;
+        }
+        #startOverlay h1 {
+            font-size: 56px;
+            color: #0ff;
+            text-shadow: 0 0 30px #0ff, 0 0 60px rgba(0,255,255,0.5);
+            margin-bottom: 5px;
+            letter-spacing: 12px;
+        }
+        #startOverlay p {
+            font-size: 18px;
+            color: #0ff;
+            text-shadow: 0 0 15px #0ff;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        #tapStartBtn {
+            padding: 14px 40px;
+            font-size: 20px;
+            background: transparent;
+            border: 2px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0,255,255,0.3);
+            text-shadow: 0 0 10px #0ff;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+        #tapStartBtn:hover,
+        #tapStartBtn:active {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 40px #0ff;
+        }
+        
+        /* ── Responsive Scaling ── */
+        #gameContainer {
+            transform-origin: top center;
+        }
     </style>
 </head>
 <body>
@@ -423,6 +570,29 @@
         </div>
     </div>
 
+    <!-- Mobile touch controls -->
+    <div id="touchControls" class="mobile-only">
+        <div class="pad p1-pad">
+            <button class="touch-btn" data-key="w">▲</button>
+            <button class="touch-btn" data-key="a">◄</button>
+            <button class="touch-btn" data-key="s">▼</button>
+            <button class="touch-btn" data-key="d">►</button>
+        </div>
+        <div class="pad p2-pad">
+            <button class="touch-btn" data-key="ArrowUp">▲</button>
+            <button class="touch-btn" data-key="ArrowLeft">◄</button>
+            <button class="touch-btn" data-key="ArrowDown">▼</button>
+            <button class="touch-btn" data-key="ArrowRight">►</button>
+        </div>
+    </div>
+
+    <!-- Start overlay for mobile -->
+    <div id="startOverlay">
+        <h1>TRON</h1>
+        <p>Lightcycles · Diagonal Edition</p>
+        <button id="tapStartBtn">▶  TAP TO START</button>
+    </div>
+
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -440,6 +610,8 @@
         let lastTime = 0;
         let accumulator = 0;
         let muted = false;
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        const restartLabel = isTouchDevice ? 'TAP TO RESTART' : 'Press SPACE to restart';
         let explosions = [];
         
         // Audio context for sound effects
@@ -906,15 +1078,15 @@
                         players.p2.score++;
                         p1ScoreEl.textContent = players.p1.score;
                         p2ScoreEl.textContent = players.p2.score;
-                        messageEl.textContent = 'Head-On Collision! Both Score! Press SPACE to restart';
+                        messageEl.textContent = 'Head-On Collision! Both Score! ' + restartLabel;
                     } else if (p1Dead) {
                         players.p2.score++;
                         p2ScoreEl.textContent = players.p2.score;
-                        messageEl.textContent = 'Player 2 Wins! Press SPACE to restart';
+                        messageEl.textContent = 'Player 2 Wins! ' + restartLabel;
                     } else if (p2Dead) {
                         players.p1.score++;
                         p1ScoreEl.textContent = players.p1.score;
-                        messageEl.textContent = 'Player 1 Wins! Press SPACE to restart';
+                        messageEl.textContent = 'Player 1 Wins! ' + restartLabel;
                     }
                     gameState = 'gameOver';
                 }, EXPLOSION_DURATION);
@@ -1057,6 +1229,18 @@
             ctx.restore();
         }
         
+        function resizeGame() {
+            if (!isTouchDevice) return;
+            const container = document.getElementById('gameContainer');
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const naturalW = 800;
+            const naturalH = 800; // 600 canvas + ~200 UI
+            const scale = Math.min(w / naturalW, h / naturalH, 1.2);
+            container.style.transform = scale < 1 ? `scale(${scale})` : '';
+            container.style.margin = '0 auto';
+        }
+        
         function gameLoop(currentTime) {
             const deltaTime = currentTime - lastTime;
             lastTime = currentTime;
@@ -1092,6 +1276,65 @@
         
         // Mute button
         document.getElementById('muteBtn').addEventListener('click', toggleMute);
+        
+        // ── Mobile / Touch Setup ──
+        if (isTouchDevice) {
+            // Show mobile controls + overlay
+            document.getElementById('touchControls').classList.add('active');
+            document.getElementById('startOverlay').classList.add('active');
+            document.getElementById('controls').textContent = 'Use the touch controls to drive!';
+            document.getElementById('message').textContent = 'TAP TO START';
+            
+            // Touch buttons simulate keyboard
+            document.querySelectorAll('.touch-btn').forEach(btn => {
+                const key = btn.dataset.key;
+                
+                btn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    keysPressed.add(key);
+                    btn.classList.add('pressed');
+                    calculateDirection();
+                }, {passive: false});
+                
+                btn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    keysPressed.delete(key);
+                    btn.classList.remove('pressed');
+                    calculateDirection();
+                }, {passive: false});
+                
+                btn.addEventListener('touchcancel', () => {
+                    keysPressed.delete(key);
+                    btn.classList.remove('pressed');
+                    calculateDirection();
+                });
+            });
+            
+            // Start overlay — tap starts the game
+            function handleStartTap(e) {
+                e.preventDefault();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (gameState !== 'playing') {
+                    initGame();
+                    document.getElementById('startOverlay').classList.remove('active');
+                }
+            }
+            document.getElementById('startOverlay').addEventListener('click', handleStartTap);
+            document.getElementById('startOverlay').addEventListener('touchend', handleStartTap);
+            
+            // On mobile, clicking/tapping the canvas also starts / restarts
+            canvas.addEventListener('click', () => {
+                if (gameState !== 'playing') {
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    initGame();
+                    document.getElementById('startOverlay').classList.remove('active');
+                }
+            });
+            
+            // Responsive scaling
+            resizeGame();
+            window.addEventListener('resize', resizeGame);
+        }
         
         requestAnimationFrame(gameLoop);
     </script>
